@@ -1,0 +1,17 @@
+services:
+  nix:
+    build: .
+    security_opt:
+      - label:disable
+    privileged: true
+    volumes:
+      - ./:/workdir
+      - /dev:/dev
+      - nix-store:/nix
+      - nix-root:/root
+    stdin_open: true
+    tty: true
+
+volumes:
+  nix-store:
+  nix-root:
