@@ -15,6 +15,10 @@ This project was originally built in 24 hours for [Car Thang](https://github.com
 - [x] networked initrd for debugging
 - [x] support for live deployments without rebuilding (thanks nix!)
 
+## Quick Setup
+
+Head on over to <https://github.com/JoeyEamigh/nixos-superbird-template> and clone the template to quickly get started with `nixos-superbird`!
+
 ## Setup
 
 To use `nixos-superbird`, you must have either Nix installed on your computer, or have a Docker container with Nix (working on adding one). If you are not on an `aarch64-linux` machine (most of you), then you also need to have QEMU binfmt set up. Look up how to set that up on your distro.
