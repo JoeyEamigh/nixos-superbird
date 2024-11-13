@@ -1,0 +1,22 @@
+# nix
+/result
+/nix
+
+# examples
+/examples/flake/result
+/examples/flake/out
+
+# qemu
+/qemu/emmc.img
+/qemu/kernel
+/qemu/btrfs.img
+/qemu/initrd.img
+
+# install
+/install/linux
+/install/.venv
+/install/__pycache__
+
+# image
+/tmp
+/out

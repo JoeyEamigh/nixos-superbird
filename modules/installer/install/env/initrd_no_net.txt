@@ -1,0 +1,2 @@
+active_slot=_b
+bootargs=earlycon=meson,0xff803000 apt_blkdevs=mmcblk2 rdinit=/superbird/init superbird.partition
