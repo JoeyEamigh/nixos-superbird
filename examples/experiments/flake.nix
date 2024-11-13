@@ -25,18 +25,19 @@
             (
               { pkgs, ... }:
               {
-                superbird.gui.app = "${pkgs.firefox}/bin/firefox";
+                # superbird.gui.app = "${pkgs.firefox}/bin/firefox";
                 # superbird.gui.app = "${pkgs.ungoogled-chromium}/bin/chromium";
-                # superbird.packages.useful = true;
+                superbird.gui.app = "${pkgs.cog}/bin/cog https://github.com/JoeyEamigh/nixos-superbird";
+                superbird.packages.useful = true;
 
-                environment.systemPackages = [
-                  # useful
-                  pkgs.btop
-                  pkgs.neovim
+                # environment.systemPackages = [
+                #   # useful
+                #   pkgs.btop
+                #   pkgs.neovim
 
-                  # fun
-                  pkgs.neofetch
-                ];
+                #   # fun
+                #   pkgs.neofetch
+                # ];
 
                 system.stateVersion = "24.11";
               }

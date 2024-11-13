@@ -61,15 +61,15 @@ inspect-image config="cog-example":
 
   just fs {{config}}
 
-  sudo losetup /dev/loop69 ./result
+  sudo losetup /dev/loop0 ./result
   sudo mkdir -p /mnt/image
-  sudo mount -o compress=zstd,noatime /dev/loop69 /mnt/image
+  sudo mount -o compress=zstd,noatime /dev/loop0 /mnt/image
 
   echo "filesystem mounted at /mnt/image"
   read -p "press enter when done to unmount"
 
   sudo umount /mnt/image
-  sudo losetup -d /dev/loop69
+  sudo losetup -d /dev/loop0
 
 build-qemu:
   nix build '.#nixosConfigurations.qemu-example.config.system.build.toplevel' -j$(nproc) --show-trace

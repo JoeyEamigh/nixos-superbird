@@ -18,9 +18,9 @@
 
 # install
 /install/linux
-/install/.venv
-/install/__pycache__
+.venv
+__pycache__
+out
 
 # image
 /tmp
-/out

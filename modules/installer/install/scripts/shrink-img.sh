@@ -5,9 +5,9 @@ if [ ! -d "./linux" ] || [ ! -f "./linux/rootfs.img" ]; then
   exit 1
 fi
 
-losetup /dev/loop69 ./linux/rootfs.img
+losetup /dev/loop0 ./linux/rootfs.img
 mkdir -p /mnt/image
-mount -o compress=zstd,noatime /dev/loop69 /mnt/image
+mount -o compress=zstd,noatime /dev/loop0 /mnt/image
 btrfs subvolume set-default 256 /mnt/image
 
 echo "defragmenting and compressing filesystem - this will take a while"
@@ -24,7 +24,7 @@ for i in {0..5}; do
 done
 
 umount /mnt/image
-losetup -d /dev/loop69
+losetup -d /dev/loop0
 
 trim_size=$(perl <./linux/rootfs.img -e 'seek(STDIN, 0x10070, 0) or sysread(STDIN, $_, 0x10070) == 0x10070 or die "seek"; sysread(STDIN, $_, 8) == 8 or die "read"; print unpack("Q<", $_), "\n"')
 truncate -s "$trim_size" ./linux/rootfs.img
