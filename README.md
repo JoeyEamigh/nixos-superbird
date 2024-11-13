@@ -4,6 +4,8 @@
 
 This project was originally built in 24 hours for [Car Thang](https://github.com/BounceU/car_thang) during a hackathon.
 
+**If you would like to support the development of `nixos-superbird` and Car Thang, please consider sending us any old Car Things you may have lying around. They are rather expensive now.**
+
 ## Features
 
 - [x] fully customizable NixOS
