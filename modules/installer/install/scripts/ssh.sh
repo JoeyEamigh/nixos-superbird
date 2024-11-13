@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [ ! -d "./ssh" ] || [ ! -f "./ssh/ssh_ed25519_key" ]; then
   echo "this script must be run in the top of the installer directory, not from the scripts dir"

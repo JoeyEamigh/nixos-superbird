@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 if iptables -L | grep 172.16.42.0; then
   echo "iptables rules exist"
 else

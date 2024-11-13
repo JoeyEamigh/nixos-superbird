@@ -10,7 +10,7 @@ fs config="cog-example":
   echo "rootfs is $(stat -Lc%s -- result | numfmt --to=iec)"
 
 installer config="cog-example":
-  #!/bin/bash
+  #!/usr/bin/env bash
   set -euo pipefail
 
   nix build '.#nixosConfigurations.{{config}}.config.system.build.installer' -j$(nproc) --show-trace
@@ -33,7 +33,7 @@ run-installer config="cog-example":
   cd out && ./install.sh
 
 zip-installer:
-  #!/bin/bash
+  #!/usr/bin/env bash
   set -euo pipefail
 
   cd ./out/
@@ -48,8 +48,15 @@ cache:
 ssh:
   ssh -i ./modules/net/ssh/ssh_host_ed25519_key root@172.16.42.2
 
+docker:
+  cd docker && docker buildx build -f ./Dockerfile.nix --platform linux/amd64,linux/arm64 -t ghcr.io/joeyeamigh/nixos-superbird/builder:latest --push .
+  # cd docker && docker buildx build -f ./Dockerfile.nix --platform linux/amd64 -t ghcr.io/joeyeamigh/nixos-superbird/builder:latest .
+
+run-docker-example:
+  docker run --privileged --rm -it -v ./examples/flake/:/workdir ghcr.io/joeyeamigh/nixos-superbird/builder:latest
+
 inspect-image config="cog-example":
-  #!/bin/bash
+  #!/usr/bin/env bash
   set -euo pipefail
 
   just fs {{config}}

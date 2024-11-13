@@ -1,4 +1,10 @@
-{ config, modulesPath, ... }:
+{
+  config,
+  pkgs,
+  modulesPath,
+  lib,
+  ...
+}:
 let
   cfg = config.superbird;
 in
@@ -13,6 +19,15 @@ in
   disabledModules = [
     "${modulesPath}/profiles/all-hardware.nix"
     "${modulesPath}/profiles/base.nix"
+  ];
+
+  environment.systemPackages = lib.mkIf cfg.packages.useful [
+    # useful
+    pkgs.btop
+    pkgs.neovim
+
+    # fun
+    pkgs.neofetch
   ];
 
   nix = {

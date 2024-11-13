@@ -1,12 +1,14 @@
 services:
   nix:
-    build: .
+    build:
+      context: .
+      dockerfile: ./Dockerfile
     security_opt:
       - label:disable
     privileged: true
     volumes:
       - ./:/workdir
-      - /dev:/dev
+      # - /dev:/dev
       - nix-store:/nix
       - nix-root:/root
     stdin_open: true

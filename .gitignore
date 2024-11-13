@@ -3,8 +3,12 @@
 /nix
 
 # examples
+/examples/flake/flake.lock
 /examples/flake/result
 /examples/flake/out
+
+# experiments
+/experiments
 
 # qemu
 /qemu/emmc.img

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [ -d .venv ]; then
   # shellcheck source=/dev/null

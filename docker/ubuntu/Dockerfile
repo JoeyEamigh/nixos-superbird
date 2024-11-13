@@ -45,9 +45,9 @@ RUN . /nix/var/nix/profiles/default/etc/profile.d/nix.sh && \
     sleep 2 && \
     nix-channel --update && \
     nix-env -iA \
-        nixpkgs.just \
-        nixpkgs.deploy-rs \
-        nixpkgs.qemu
+    nixpkgs.just \
+    nixpkgs.deploy-rs \
+    nixpkgs.qemu
 
 WORKDIR /workdir
 

@@ -1,0 +1,4 @@
+[submodule "template"]
+	path = template
+	url = https://github.com/JoeyEamigh/nixos-superbird-template.git
+	branch = main
