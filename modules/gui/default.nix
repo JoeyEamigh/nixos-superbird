@@ -17,6 +17,8 @@ in
 {
 
   config = lib.mkIf cfg.gui.enable {
+    environment.systemPackages = with pkgs; [ wlr-randr ];
+
     services.cage = {
       enable = true;
       user = "superbird";
