@@ -10,7 +10,7 @@ if [ ! -d "./linux" ] || [ ! -f "./linux/rootfs.img" ]; then
 fi
 
 mkdir -p /mnt/image
-if [ "$in_docker" != true ]; then
+if [ "$in_docker" == true ]; then
   mount -o compress=zstd,noatime ./linux/rootfs.img /mnt/image
 else
   losetup /dev/loop0 ./linux/rootfs.img

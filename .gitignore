@@ -6,6 +6,7 @@
 /examples/flake/flake.lock
 /examples/flake/result
 /examples/flake/out
+/examples/experiments/result
 
 # experiments
 /experiments
