@@ -1,13 +1,22 @@
 #!/usr/bin/env bash
 
+if [ -f "/.dockerenv" ]; then
+  in_docker=true
+fi
+
 if [ ! -d "./linux" ] || [ ! -f "./linux/rootfs.img" ]; then
   echo "this script must be run in the top of the installer directory, not from the scripts dir"
   exit 1
 fi
 
-losetup /dev/loop0 ./linux/rootfs.img
 mkdir -p /mnt/image
-mount -o compress=zstd,noatime /dev/loop0 /mnt/image
+if [ "$in_docker" != true ]; then
+  mount -o compress=zstd,noatime ./linux/rootfs.img /mnt/image
+else
+  losetup /dev/loop0 ./linux/rootfs.img
+  mount -o compress=zstd,noatime /dev/loop0 /mnt/image
+fi
+
 btrfs subvolume set-default 256 /mnt/image
 
 echo "defragmenting and compressing filesystem - this will take a while"
@@ -24,7 +33,9 @@ for i in {0..5}; do
 done
 
 umount /mnt/image
-losetup -d /dev/loop0
+if [ "$in_docker" != true ]; then
+  losetup -d /dev/loop0
+fi
 
 trim_size=$(perl <./linux/rootfs.img -e 'seek(STDIN, 0x10070, 0) or sysread(STDIN, $_, 0x10070) == 0x10070 or die "seek"; sysread(STDIN, $_, 8) == 8 or die "read"; print unpack("Q<", $_), "\n"')
 truncate -s "$trim_size" ./linux/rootfs.img
