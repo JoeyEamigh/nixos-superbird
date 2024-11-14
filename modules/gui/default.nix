@@ -17,7 +17,10 @@ in
 {
 
   config = lib.mkIf cfg.gui.enable {
-    environment.systemPackages = with pkgs; [ wlr-randr ];
+    environment.systemPackages = with pkgs; [
+      wlr-randr
+      fbset
+    ];
 
     services.cage = {
       enable = true;

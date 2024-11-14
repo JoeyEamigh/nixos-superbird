@@ -26,8 +26,41 @@
               { pkgs, ... }:
               {
                 # superbird.gui.app = "${pkgs.firefox}/bin/firefox";
-                # superbird.gui.app = "${pkgs.ungoogled-chromium}/bin/chromium";
-                superbird.gui.app = "${pkgs.cog}/bin/cog https://github.com/JoeyEamigh/nixos-superbird";
+                superbird.gui.app = ''
+                  ${pkgs.ungoogled-chromium}/bin/chromium \
+                    --ozone-platform-hint=auto \
+                    --ozone-platform=wayland \
+                    --no-sandbox \
+                    --autoplay-policy=no-user-gesture-required \
+                    --use-fake-ui-for-media-stream \
+                    --use-fake-device-for-media-stream \
+                    --disable-sync \
+                    --remote-debugging-port=9222 \
+                    --force-device-scale-factor=1.0 \
+                    --pull-to-refresh=0 \
+                    --disable-smooth-scrolling \
+                    --disable-login-animations \
+                    --disable-modal-animations \
+                    --noerrdialogs \
+                    --no-first-run \
+                    --disable-infobars \
+                    --fast \
+                    --fast-start \
+                    --disable-pinch \
+                    --disable-translate \
+                    --overscroll-history-navigation=0 \
+                    --hide-scrollbars \
+                    --disable-overlay-scrollbar \
+                    --disable-features=OverlayScrollbar \
+                    --disable-features=TranslateUI \
+                    --disable-features=TouchpadOverscrollHistoryNavigation,OverscrollHistoryNavigation \
+                    --password-store=basic \
+                    --touch-events=enabled \
+                    --ignore-certificate-errors \
+                    --kiosk \
+                    --app=https://motherfuckingwebsite.com/
+                '';
+                # superbird.gui.app = "${pkgs.cog}/bin/cog https://github.com/JoeyEamigh/nixos-superbird";
                 superbird.packages.useful = true;
 
                 # environment.systemPackages = [
