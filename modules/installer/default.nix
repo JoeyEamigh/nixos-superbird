@@ -10,6 +10,7 @@
       cp ${./install/install.sh} $out/install.sh
       cp ${./install/install.py} $out/install.py
       cp ${./install/superbird_device.py} $out/superbird_device.py
+      cp ${./install/readme.md} $out/readme.md
 
       cp -r ${./install/boot} $out/boot
       cp -r ${./install/env} $out/env
