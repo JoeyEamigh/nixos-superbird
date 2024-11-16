@@ -9,6 +9,7 @@ build-users-group = nixbld
 filter-syscalls = false
 sandbox = true
 experimental-features = nix-command flakes
+accept-flake-config = true
 substitute = true
 substituters = https://cache.nixos.org https://nix-community.cachix.org https://superbird.attic.claiborne.soy/superbird
 trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= superbird:r9Hm/REl7BEr6+9UQoS+nxzqxY2sKUhsDCNy5PGQbDU=
@@ -29,6 +30,7 @@ filter-syscalls = false
 sandbox = true
 experimental-features = nix-command flakes
 extra-platforms = aarch64-linux
+accept-flake-config = true
 substitute = true
 substituters = https://cache.nixos.org https://nix-community.cachix.org https://superbird.attic.claiborne.soy/superbird
 trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= superbird:r9Hm/REl7BEr6+9UQoS+nxzqxY2sKUhsDCNy5PGQbDU=
