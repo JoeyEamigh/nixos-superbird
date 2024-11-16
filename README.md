@@ -133,7 +133,6 @@ After the system is installed and booted, you will have to set up a wired networ
 
 - touchscreen calibration is sometimes incorrect
 - there's a mouse cursor on the screen
-- bluetooth firmware will not load during boot, requires restart of bluetooth daemon
 
 ## Troubleshooting
 
