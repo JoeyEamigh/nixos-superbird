@@ -1,15 +1,15 @@
-build config="cog-example":
+build config="chrome-example":
   nix build '.#nixosConfigurations.{{config}}.config.system.build.toplevel' -j$(nproc) --show-trace
 
-initrd config="cog-example":
+initrd config="chrome-example":
   nix build '.#nixosConfigurations.{{config}}.config.system.build.initrd' -j$(nproc) --show-trace
   echo "initrd is $(stat -Lc%s -- result/initrd | numfmt --to=iec)"
 
-fs config="cog-example":
+fs config="chrome-example":
   nix build '.#nixosConfigurations.{{config}}.config.system.build.btrfs' -j$(nproc) --show-trace
   echo "rootfs is $(stat -Lc%s -- result | numfmt --to=iec)"
 
-installer config="cog-example":
+installer config="chrome-example":
   #!/usr/bin/env bash
   set -euo pipefail
 
@@ -28,7 +28,7 @@ installer config="cog-example":
   echo "rootfs (compact) is $(stat -Lc%s -- ./linux/rootfs.img | numfmt --to=iec)"
 
 
-run-installer config="cog-example":
+run-installer config="chrome-example":
   just installer {{config}}
   cd out && ./install.sh
 
@@ -41,7 +41,7 @@ zip-installer:
 
 cache:
   attic push superbird \
-    $(nix build .#nixosConfigurations.cog-example.config.system.build.toplevel --no-link --print-out-paths) \
+    $(nix build .#nixosConfigurations.chrome-example.config.system.build.toplevel --no-link --print-out-paths) \
     $(nix build .#nixosConfigurations.headless-example.config.system.build.toplevel --no-link --print-out-paths) \
     $(nix build .#nixosConfigurations.qemu-example.config.system.build.toplevel --no-link --print-out-paths)
 
@@ -55,7 +55,7 @@ docker:
 run-docker-example:
   docker run --privileged --rm -it -v ./examples/flake/:/workdir ghcr.io/joeyeamigh/nixos-superbird/builder:latest
 
-inspect-image config="cog-example":
+inspect-image config="chrome-example":
   #!/usr/bin/env bash
   set -euo pipefail
 

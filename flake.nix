@@ -31,11 +31,11 @@
       nixosModules.superbird = import ./modules;
 
       nixosConfigurations = {
-        cog-example = nixosSystem {
+        chrome-example = nixosSystem {
           system = "aarch64-linux";
           modules = [
             self.nixosModules.superbird
-            ./examples/cog.nix
+            ./examples/chrome.nix
           ];
         };
 
@@ -66,7 +66,7 @@
 
       checks.aarch64-linux = self.packages.aarch64-linux;
       packages.aarch64-linux = {
-        example-cog = self.nixosConfigurations.cog-example.config.system.build.installer;
+        example-chrome = self.nixosConfigurations.chrome-example.config.system.build.installer;
         example-doom = self.nixosConfigurations.doom-example.config.system.build.installer;
         example-headless = self.nixosConfigurations.headless-example.config.system.build.installer;
       };

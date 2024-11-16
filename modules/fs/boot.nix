@@ -71,6 +71,23 @@ in
 
         echo "boot >>> done!" > /dev/kmsg
       fi
+
+      ${
+        if cfg.bluetooth.enable then
+          ''
+            if [ ! -f /lib/firmware/brcm/BCM.hcd ] || [ ! -f /lib/firmware/brcm/BCM20703A2.hcd ]; then
+              echo "firmware >>> bluetooth firmware not detected - setting up" > /dev/kmsg
+
+              mkdir -p /lib/firmware/brcm
+              cp ${../net/firmware/brcm/BCM.hcd} /lib/firmware/brcm/BCM.hcd
+              cp ${../net/firmware/brcm/BCM20703A2.hcd} /lib/firmware/brcm/BCM20703A2.hcd
+
+              echo "firmware >>> bluetooth firmware set up!" > /dev/kmsg
+            fi
+          ''
+        else
+          ''''
+      }
     '';
   };
 }

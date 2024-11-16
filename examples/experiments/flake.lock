@@ -42,7 +42,7 @@
       },
       "locked": {
         "lastModified": 0,
-        "narHash": "sha256-Mvlu2XenmY6Khk2VruZjLAIU67O2uUMOxAmair50S9I=",
+        "narHash": "sha256-ul8xr+Rme4gvoizL9hwzWMvTJ7c/D73BuaQmxRdi64c=",
         "path": "../../",
         "type": "path"
       },
@@ -83,27 +83,14 @@
         "type": "github"
       }
     },
-    "nixpkgs_3": {
-      "locked": {
-        "lastModified": 1731139594,
-        "narHash": "sha256-IigrKK3vYRpUu+HEjPL/phrfh7Ox881er1UEsZvw9Q4=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "76612b17c0ce71689921ca12d9ffdc9c23ce40b2",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nixos",
-        "ref": "nixos-unstable",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
         "deploy-rs": "deploy-rs",
         "nixos-superbird": "nixos-superbird",
-        "nixpkgs": "nixpkgs_3"
+        "nixpkgs": [
+          "nixos-superbird",
+          "nixpkgs"
+        ]
       }
     },
     "systems": {

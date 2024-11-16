@@ -1,11 +1,10 @@
 {
   description = "NixOS Superbird configuration";
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-
     nixos-superbird.url = "path:../../";
     # nixos-superbird.url = "github:joeyeamigh/nixos-superbird/main";
 
+    nixpkgs.follows = "nixos-superbird/nixpkgs";
     deploy-rs.url = "github:serokell/deploy-rs";
   };
 
@@ -26,9 +25,9 @@
           modules = [
             nixos-superbird.nixosModules.superbird
             (
-              { pkgs, ... }:
+              { ... }:
               {
-                superbird.gui.app = "${pkgs.cog}/bin/cog https://github.com/JoeyEamigh/nixos-superbird";
+                superbird.gui.kiosk = "https://github.com/JoeyEamigh/nixos-superbird";
                 system.stateVersion = "24.11";
               }
             )

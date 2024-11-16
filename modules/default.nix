@@ -35,9 +35,16 @@
 
       app = mkOption {
         default = null;
-        type = types.str;
-        example = "\${pkgs.cog}/bin/cog https://example.com";
+        type = types.nullOr types.str;
+        example = "\${pkgs.cog}/bin/cog https://github.com/JoeyEamigh/nixos-superbird";
         description = "path to the application to run in cage";
+      };
+
+      kiosk = mkOption {
+        default = null;
+        type = types.nullOr types.str;
+        example = "https://github.com/JoeyEamigh/nixos-superbird";
+        description = "website to place into chromium kiosk mode";
       };
     };
 

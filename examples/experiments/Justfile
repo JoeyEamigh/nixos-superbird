@@ -1,10 +1,11 @@
 build:
-  nix build '.#nixosConfigurations.superbird.config.system.build.installer' -j"$(nproc)" --show-trace
+  nix flake update && nix build '.#nixosConfigurations.superbird.config.system.build.installer' -j"$(nproc)" --show-trace
 
 installer:
   #!/usr/bin/env bash
   set -euo pipefail
 
+  nix flake update
   nix build '.#nixosConfigurations.superbird.config.system.build.installer' -j$(nproc) --show-trace
   echo "kernel is $(stat -Lc%s -- result/linux/kernel | numfmt --to=iec)"
   echo "initrd is $(stat -Lc%s -- result/linux/initrd.img | numfmt --to=iec)"
@@ -32,4 +33,4 @@ zip-installer:
   zip -r nixos-superbird-installer.zip .
 
 push:
-  nix run github:serokell/deploy-rs
+  nix flake update && nix run github:serokell/deploy-rs

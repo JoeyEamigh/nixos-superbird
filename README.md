@@ -38,8 +38,8 @@ The most basic form of using `nixos-superbird` is a single `flake.nix` file.
 {
   description = "NixOS Superbird configuration";
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nixos-superbird.url = "github:joeyeamigh/nixos-superbird/main";
+    nixpkgs.follows = "nixos-superbird/nixpkgs"; # if you need newer versions of apps you can override or PR this repo
   };
 
   outputs =
@@ -56,10 +56,13 @@ The most basic form of using `nixos-superbird` is a single `flake.nix` file.
         superbird = nixosSystem {
           modules = [
             nixos-superbird.nixosModules.superbird
-            {
-              superbird.gui.app = "${pkgs.cog}/bin/cog https://github.com/JoeyEamigh/nixos-superbird";
-              system.stateVersion = "24.11";
-            }
+            (
+              { ... }:
+              {
+                superbird.gui.kiosk = "https://github.com/JoeyEamigh/nixos-superbird";
+                system.stateVersion = "24.11";
+              }
+            )
           ];
         };
       };
@@ -85,21 +88,23 @@ To make this flake as easy to use as possible, not many things are directly conf
 {
   superbird = {
     bluetooth = {
-      enable = true;
-      name = "Superbird";
+      enable = true; # whether bluetooth is enabled
+      name = "Superbird"; # name of the device as it broadcasts over bluetooth
     };
 
     gui = {
-      enable = true;
-      app = null;
+      enable = true; # whether cage (kiosk-mode wayland compositor) is enabled
+      app = null; # full path to an app to run - i.e. "${pkgs.cog}/bin/cog"
+      kiosk = null; # url to send a chromium kiosk (with basic gpu acceleration) to - i.e. "https://github.com/JoeyEamigh/nixos-superbird"
     };
+    # you cannot have both app and kiosk set at the same time - if you need more control use app or disable gui and diy
 
     swap = {
-      enable = true;
-      size = 512;
+      enable = true; # whether to create a swapfile
+      size = 512; # size of said swapfile in MiB
     };
 
-    qemu = false;
+    qemu = false; # whether you are building an image to run IN qemu
   };
 }
 ```

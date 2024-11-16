@@ -1,8 +1,8 @@
 {
   description = "NixOS Superbird configuration";
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nixos-superbird.url = "path:../../";
+    nixpkgs.follows = "nixos-superbird/nixpkgs";
     deploy-rs.url = "github:serokell/deploy-rs";
   };
 
@@ -25,7 +25,6 @@
             (
               { pkgs, ... }:
               {
-                # superbird.gui.app = "${pkgs.firefox}/bin/firefox";
                 superbird.gui.app = ''
                   ${pkgs.ungoogled-chromium}/bin/chromium \
                     --ozone-platform-hint=auto \
@@ -58,20 +57,10 @@
                     --touch-events=enabled \
                     --ignore-certificate-errors \
                     --kiosk \
-                    --app=https://motherfuckingwebsite.com/
+                    --app=https://github.com/JoeyEamigh/nixos-superbird
                 '';
-                # superbird.gui.app = "${pkgs.cog}/bin/cog https://github.com/JoeyEamigh/nixos-superbird";
+
                 superbird.packages.useful = true;
-
-                # environment.systemPackages = [
-                #   # useful
-                #   pkgs.btop
-                #   pkgs.neovim
-
-                #   # fun
-                #   pkgs.neofetch
-                # ];
-
                 system.stateVersion = "24.11";
               }
             )
