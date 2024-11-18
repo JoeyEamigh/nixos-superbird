@@ -9,6 +9,7 @@ from superbird_device import SuperbirdDevice, find_device, enter_burn_mode
 from pyroute2 import NDB
 
 # credits: based heavily on https://github.com/bishopdynamics/superbird-tool by bishopdynamics
+# macos work done by Jordan @1.tb
 
 KERNEL = "./linux/kernel"
 INITRD = "./linux/initrd.img"
@@ -31,23 +32,141 @@ DEVICE_NET_DELAY = 25
 DEVICE_NET_TIMEOUT = 30
 
 
-def save_network_interfaces():
+def get_network_interfaces_macos() -> list[str]:
+    """Get list of network interfaces on macOS"""
+    try:
+        result = subprocess.run(
+            ["networksetup", "-listallhardwareports"], capture_output=True, text=True
+        )
+        interfaces = []
+        for line in result.stdout.split("\n"):
+            if line.startswith("Device:"):
+                interfaces.append(line.split(": ")[1])
+        return interfaces
+    except Exception as e:
+        print(f"Error getting network interfaces: {e}")
+        return []
+
+
+def save_network_interfaces_macos():
+    """Save current list of network interfaces"""
+    global interfaces
+    interfaces = get_network_interfaces_macos()
+
+
+def find_new_network_interface_macos() -> str | None:
+    """Find any new network interface that appears"""
+    current_interfaces = get_network_interfaces_macos()
+    new_interfaces = set(current_interfaces) - set(interfaces)
+    return next(iter(new_interfaces)) if new_interfaces else None
+
+
+def set_interface_up_macos(ifname: str):
+    """Configure network interface on macOS with additional verification"""
+    try:
+        print(f"\nConfiguring interface {ifname}...")
+
+        subprocess.run(["sudo", "ifconfig", ifname, "down"], check=False)
+        subprocess.run(["sudo", "ifconfig", ifname, "0.0.0.0"], check=False)
+
+        subprocess.run(["sudo", "route", "-n", "delete", "172.16.42.0/24"], check=False)
+
+        time.sleep(2)
+
+        subprocess.run(
+            [
+                "sudo",
+                "ifconfig",
+                ifname,
+                HOST_IP_ADDR,
+                "netmask",
+                "255.255.255.0",
+                "up",
+            ],
+            check=True,
+        )
+        print("Interface configured with IP and brought up")
+
+        subprocess.run(
+            ["sudo", "route", "-n", "add", "172.16.42.0/24", HOST_IP_ADDR], check=True
+        )
+        print("Route added")
+
+        result = subprocess.run(["ifconfig", ifname], capture_output=True, text=True)
+        print(f"\nInterface status:\n{result.stdout}")
+
+        result = subprocess.run(["netstat", "-nr"], capture_output=True, text=True)
+        print(f"\nRouting table:\n{result.stdout}")
+
+        print("\nWaiting for device network to stabilize...")
+        time.sleep(10)
+
+        print("\nAttempting to ping device...")
+        for i in range(10):
+            print(f"Ping attempt {i+1}/10...")
+            if (
+                subprocess.run(
+                    ["ping", "-c", "1", "-t", "2", DEVICE_IP_ADDR], capture_output=True
+                ).returncode
+                == 0
+            ):
+                print("Device is responding to ping!")
+                return
+            time.sleep(2)
+        print("Warning: Device is not responding to ping, but continuing anyway...")
+
+    except subprocess.CalledProcessError as e:
+        print(f"Error configuring network interface: {e}")
+        sys.exit(1)
+
+
+def save_network_interfaces_linux():
     with NDB() as ndb:
         for interface in ndb.interfaces.dump():  # type: ignore
             interfaces.append(interface.ifname)
 
 
-def find_new_network_interface() -> str | None:
+def find_new_network_interface_linux() -> str | None:
     with NDB() as ndb:
         for interface in ndb.interfaces.dump():  # type: ignore
             if interface.ifname not in interfaces:
                 return interface.ifname
 
 
-def set_interface_up(ifname: str):
+def set_interface_up_linux(ifname: str):
     with NDB() as ndb:
         with ndb.interfaces[ifname] as iface:  # type: ignore
             iface.add_ip(HOST_IP_ADDR).set("state", "up")
+
+
+def wait_for_ssh(ip: str, timeout: int = 30):
+    """Wait for SSH to become available"""
+    print(f"\nWaiting for SSH on {ip} to become available...")
+    start_time = time.time()
+    while time.time() - start_time < timeout:
+        try:
+            result = subprocess.run(
+                [
+                    "ssh",
+                    "-o",
+                    "ConnectTimeout=1",
+                    "-o",
+                    "StrictHostKeyChecking=no",
+                    f"root@{ip}",
+                    "echo 'SSH test'",
+                ],
+                capture_output=True,
+                text=True,
+            )
+            if result.returncode == 0:
+                print("SSH connection successful!")
+                return True
+        except Exception:
+            pass
+        print(".", end="", flush=True)
+        time.sleep(1)
+    print("\nSSH connection timed out!")
+    return False
 
 
 def get_device() -> SuperbirdDevice:
@@ -74,6 +193,19 @@ def get_device() -> SuperbirdDevice:
 
 if __name__ == "__main__":
     host_system = platform.system()
+    save_network_interfaces = (
+        save_network_interfaces_linux
+        if host_system == "Linux"
+        else save_network_interfaces_macos
+    )
+    find_new_network_interface = (
+        find_new_network_interface_linux
+        if host_system == "Linux"
+        else find_new_network_interface_macos
+    )
+    set_interface_up = (
+        set_interface_up_linux if host_system == "Linux" else set_interface_up_macos
+    )
 
     parser = ArgumentParser(
         prog="install.py",
@@ -89,7 +221,7 @@ if __name__ == "__main__":
         "-n",
         "--no-net",
         action="store_true",
-        default=host_system != "Linux",
+        default=False,
         help="install Car Thang without using host bridge networking (slower) - defaults to true on non-Linux hosts",
     )
     parser.add_argument(
@@ -113,8 +245,8 @@ if __name__ == "__main__":
         "WARNING: this is a very destructive script. make sure you know what it is going to do!"
     )
 
-    if host_system != "Linux":
-        print("this script only supports Linux at the moment")
+    if host_system != "Linux" and host_system != "Darwin":
+        print("this script only supports Linux and MacOS at the moment")
         sys.exit(1)
 
     print("\n")
@@ -133,9 +265,14 @@ if __name__ == "__main__":
             input("press enter to continue >>> ")
 
             print("setting up iptables rules...")
-            if subprocess.call("scripts/iptables.sh") != 0:
-                print("something went wrong setting up the firewall rules.")
-                sys.exit(1)
+            if host_system == "Linux":
+                if subprocess.call("scripts/iptables.sh") != 0:
+                    print("something went wrong setting up the firewall rules.")
+                    sys.exit(1)
+            elif host_system == "Darwin":
+                if subprocess.call("scripts/pfctl.sh") != 0:
+                    print("something went wrong setting up the firewall rules.")
+                    sys.exit(1)
 
         print("making note of current network interfaces...")
         save_network_interfaces()
@@ -192,6 +329,33 @@ if __name__ == "__main__":
     input("press enter when device is ready >>> ")
     print("\n")
 
+    if not args.no_net:
+        print(
+            "this script will now copy the root filesystem to the device over ssh. this will take a while."
+        )
+        print(f"Checking if rootfs exists at {ROOTFS}...")
+        if not os.path.exists(ROOTFS):
+            print(f"ERROR: Could not find rootfs at {ROOTFS}")
+            sys.exit(1)
+
+        print("\nWaiting for device to complete boot sequence...")
+        time.sleep(DEVICE_NET_DELAY)
+
+        if not wait_for_ssh(DEVICE_IP_ADDR):
+            print("\nFalling back to USB method since SSH is unavailable...")
+            args.no_net = True
+        else:
+            print("\nStarting rootfs copy via SSH...")
+            dd_command = f"dd if={ROOTFS} bs=1M status=progress | ssh -o StrictHostKeyChecking=no root@{DEVICE_IP_ADDR} dd of=/dev/mmcblk2p2 bs=1M"
+            print(f"Running command: {dd_command}")
+            result = os.system(dd_command)
+
+            if result != 0:
+                print("\nERROR: SSH copy failed, falling back to USB method...")
+                args.no_net = True
+            else:
+                print("\nSSH copy completed successfully!")
+
     if args.no_net:
         print("now you must boot your device into usb mode one more time")
         print(
@@ -207,29 +371,7 @@ if __name__ == "__main__":
         device.restore_partition(RESTORE_BLOCK_OFFSET, ROOTFS)
         print("\n")
         print("done!\n")
-
-        print(
-            "this script will now set the u-boot env vars for booting the new system."
-        )
-        print("wiping env partition")
-        device.bulkcmd("amlmmc env")
-        device.bulkcmd("amlmmc erase env")
-        print("sending full_custom env file...")
-        device.send_env_file(ENV_FULL_CUSTOM)
-        device.bulkcmd("env save")
-
-        print("\n")
-        print("done!\n")
     else:
-        print(
-            "this script will now copy the root filesystem to the device over ssh. this will take a while."
-        )
-        os.system(
-            f"dd if={ROOTFS} status=progress | ssh -o StrictHostKeyChecking=no root@{DEVICE_IP_ADDR} dd of=/dev/mmcblk2p2"
-        )
-        print("\n")
-        print("done!\n")
-
         print("now you must boot your device into usb mode one more time")
         print(
             "unplug your device, then replug it while holding the 1st and 4th buttons on the top."
@@ -237,16 +379,15 @@ if __name__ == "__main__":
         input("press enter when done >>> ")
         print("\n")
 
-        print(
-            "this script will now set the u-boot env vars for booting the new system."
-        )
         device = get_device()
-        device.bulkcmd("amlmmc env")
-        print("sending full_custom env file...")
-        device.send_env_file(ENV_FULL_CUSTOM)
-        device.bulkcmd("env save")
 
-        print("\n")
-        print("done!\n")
+    print("this script will now set the u-boot env vars for booting the new system.")
+    device.bulkcmd("amlmmc env")
+    print("sending full_custom env file...")
+    device.send_env_file(ENV_FULL_CUSTOM)
+    device.bulkcmd("env save")
+
+    print("\n")
+    print("done!\n")
 
     print("you should now have a fully functioning Car Thang! power cycle and enjoy!")
