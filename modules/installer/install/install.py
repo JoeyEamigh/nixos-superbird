@@ -338,9 +338,6 @@ if __name__ == "__main__":
             print(f"ERROR: Could not find rootfs at {ROOTFS}")
             sys.exit(1)
 
-        print("\nWaiting for device to complete boot sequence...")
-        time.sleep(DEVICE_NET_DELAY)
-
         if not wait_for_ssh(DEVICE_IP_ADDR):
             print("\nFalling back to USB method since SSH is unavailable...")
             args.no_net = True
