@@ -93,25 +93,25 @@
       (self: super: {
         superbirdKernel =
           (super.linuxManualConfig {
-            version = "6.6.43";
-            modDirVersion = "6.6.43";
-            # extraMeta.branch = "6.6.43";
+            version = "6.6.62";
+            modDirVersion = "6.6.62";
+            extraMeta.branch = "6.6.62";
 
             configfile = ./superbird_defconfig;
             allowImportFromDerivation = true;
 
             src = super.fetchFromGitHub {
-              owner = "alexcaoys";
+              owner = "JoeyEamigh";
               repo = "linux-superbird-6.6.y";
-              rev = "95c292d859f44efaffcea509fc2575d028d81458";
-              sha256 = "sha256-Or1bWEJbckQ9u8GWLakNdRe1Vi3OXyR1WPB17I1F6lQ=";
+              rev = "26f9db6f4020210a9c8e896bbf416825012d943e";
+              sha256 = "sha256-Pe/UovmT5GZ+AHG3eZQ/vMewC20ZlsthqOd8QFZ5Drc=";
             };
 
             kernelPatches = [ ];
           }).overrideAttrs
             (old: {
               nativeBuildInputs = old.nativeBuildInputs ++ [ super.ubootTools ];
-              buildDTBs = false;
+              buildDTBs = true;
             });
 
         superbirdQemuKernel = super.linuxKernel.kernels.linux_6_6.override {
