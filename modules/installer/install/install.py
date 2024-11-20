@@ -24,7 +24,8 @@ ENV_INITRD_NET = "./env/initrd_net.txt"
 ENV_INITRD_NO_NET = "./env/initrd_no_net.txt"
 
 interfaces: list[str] = []
-HOST_IP_ADDR = "172.16.42.1/24"
+HOST_IP_ADDR_W_MASK = "172.16.42.1/24"
+HOST_IP_ADDR = "172.16.42.1"
 HOST_NET_TIMEOUT = 30
 
 DEVICE_IP_ADDR = "172.16.42.2"
@@ -136,7 +137,7 @@ def find_new_network_interface_linux() -> str | None:
 def set_interface_up_linux(ifname: str):
     with NDB() as ndb:
         with ndb.interfaces[ifname] as iface:  # type: ignore
-            iface.add_ip(HOST_IP_ADDR).set("state", "up")
+            iface.add_ip(HOST_IP_ADDR_W_MASK).set("state", "up")
 
 
 def wait_for_ssh(ip: str, timeout: int = 30):
