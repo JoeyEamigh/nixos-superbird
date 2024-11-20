@@ -21,9 +21,9 @@
       cp ${../net/ssh/ssh_host_rsa_key} $out/ssh/ssh_rsa_key
 
       mkdir $out/linux
-      cp ${../fs/resources/meson-g12a-superbird.dtb} $out/linux/meson-g12a-superbird.dtb
       cp ${config.system.build.initrd}/initrd.img $out/linux/initrd.img
       cp ${config.system.build.toplevel}/kernel $out/linux/kernel
+      cp ${config.system.build.toplevel}/dtbs/amlogic/meson-g12a-superbird.dtb $out/linux/meson-g12a-superbird.dtb
       cp ${config.system.build.btrfs} $out/linux/rootfs.img
     '';
   };
