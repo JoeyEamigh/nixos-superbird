@@ -82,7 +82,7 @@
       (self: super: {
         # patched version of cage that fixes window centering
         cage = super.cage.overrideAttrs (old: {
-          patches = [
+          patches = (old.patches or []) ++ [
             (super.fetchpatch {
               url = "https://patch-diff.githubusercontent.com/raw/cage-kiosk/cage/pull/365.patch";
               hash = "sha256-Grap5a3+8JkxMGS2dFLcKrElDvjq9QKaLQqhL722keo=";
