@@ -3,6 +3,8 @@ FROM nixos/nix AS base
 # arm64-specific stage
 FROM base AS build-arm64
 
+RUN rm /etc/nix/nix.conf
+
 RUN <<EOR
 tee /etc/nix/nix.conf << EOF
 build-users-group = nixbld
@@ -22,6 +24,8 @@ RUN nix-channel --update
 
 # amd64-specific stage
 FROM base AS build-amd64
+
+RUN rm /etc/nix/nix.conf
 
 RUN <<EOR
 tee /etc/nix/nix.conf << EOF
