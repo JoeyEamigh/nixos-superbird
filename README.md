@@ -1,19 +1,30 @@
 # NixOS for the Spotify Car Thing
 
-`nixos-superbird` is a project to help build custom Linux images for the Spotify Car Thing and easily install them. This is the first project (to my knowledge) to democratize Linux for the Superbird, and by far the easiest way to attain full control of the Car Thing.
+`nixos-superbird` is a project to help build custom Linux images for the Spotify Car Thing and easily install them. This is the first project to democratize Linux for the Superbird, and by far the easiest way to attain full control of the Car Thing.
 
-This project was originally built in 24 hours for [Car Thang](https://github.com/BounceU/car_thang) during a hackathon.
+**If you would like to support the development of `nixos-superbird`, please consider sending us any old Car Things you may have lying around. They are rather expensive now.**
 
-**If you would like to support the development of `nixos-superbird` and Car Thang, please consider sending us any old Car Things you may have lying around. They are rather expensive now.**
+Join the [Thing Labs Discord](https://tl.mt/d) for the most up-to-date information on Car Thing Hacking!
+
+## Credits and Attribution
+
+If you are using `nixos-superbird` to build a custom Car Thing image, you MUST credit both `nixos-superbird` and Thing Labs. Additionally, if you build your app with [`BridgeThing`](https://github.com/JoeyEamigh/bridgething), you must credit the `BridgeThing` repo as well. This credit can be done on a settings or about page, but must not be hidden.
+
+Credit to Joey Eamigh and Thing Labs for the firmware image must be provided in a user-facing location in your application. If you change the bootlogo, it must not be harder to find than your own credits and version number.
+
+The intention of this clause is to support and motivate the Thing Labs team, not undermine your own work.
 
 ## Features
 
 - [x] fully customizable NixOS
-- [x] one-click guided installer
-- [x] compressed BTRFS filesystem for maximum storage
+- [x] easy installation via Terbium
 - [x] support for Bluetooth and Bluetooth PAN (tetherless Car Thing, anyone?)
-- [x] networked initrd for debugging
+- [x] `cdc_ncm`-based networking for tethered Linux, Windows, and MacOS support
+- [x] built-in dhcp server for zero-config networking
 - [x] support for live deployments without rebuilding (thanks nix!)
+- [x] modified spotify kernel for maximum compatibility
+- [x] first-class [`BridgeThing`](https://github.com/JoeyEamigh/bridgething) support
+- [x] integrated tooling to host your own webapp on-device
 
 ## Quick Setup
 
@@ -21,7 +32,7 @@ Head on over to <https://github.com/JoeyEamigh/nixos-superbird-template> and clo
 
 ## Setup
 
-To use `nixos-superbird`, you must have either Nix installed on your computer, or have a Docker container with Nix (working on adding one). If you are not on an `aarch64-linux` machine (most of you), then you also need to have QEMU binfmt set up. Look up how to set that up on your distro.
+To use `nixos-superbird`, you must have either Nix installed on your computer, or have Docker installed. If you are not on an `aarch64-linux` machine (most of you), then you also need to have QEMU binfmt set up. Look up how to set that up on your distro.
 
 - check if it's installed by running `ls /proc/sys/fs/binfmt_misc/`
 - on Arch, you can just run `pacman -S qemu-user-static-binfmt`
@@ -54,12 +65,16 @@ The most basic form of using `nixos-superbird` is a single `flake.nix` file.
     {
       nixosConfigurations = {
         superbird = nixosSystem {
+          system = "aarch64-linux";
+          specialArgs = { inherit self; };
           modules = [
             nixos-superbird.nixosModules.superbird
             (
               { ... }:
               {
-                superbird.gui.kiosk = "https://github.com/JoeyEamigh/nixos-superbird";
+                superbird.gui.kiosk_url = "https://github.com/JoeyEamigh/nixos-superbird";
+
+                superbird.stateVersion = "0.2";
                 system.stateVersion = "24.11";
               }
             )
@@ -80,6 +95,8 @@ nix build '.#nixosConfigurations.superbird.config.system.build.installer'
 
 Once you have Nix installed on your Superbird, you can make changes to your flake and run the `push` script in the `Justfile` to update the device without reflashing.
 
+Read through the [`Justfile`](./examples/flake/Justfile) in `./examples/flake` to see all steps to build an installer.
+
 ## Configuration
 
 To make this flake as easy to use as possible, not many things are directly configurable at the moment. You can obviously override anything I have set with `lib.mkForce`. You can view all superbird configuration options in [`./modules/default.nix`](./modules/default.nix), and the defaults are listed below. If you would like to add more config options, feel free to PR with the config and an example.
@@ -87,62 +104,98 @@ To make this flake as easy to use as possible, not many things are directly conf
 ```nix
 {
   superbird = {
+    name = "nixos-superbird"; # name of the application built with nixos-superbird
+    version = "v1.0.0"; # version of the application built with nixos-superbird
+    description = "NixOS for the Spotify Car Thing"; # description of the application built with nixos-superbird
+
     bluetooth = {
       enable = true; # whether bluetooth is enabled
       name = "Superbird"; # name of the device as it broadcasts over bluetooth
     };
 
     gui = {
-      enable = true; # whether cage (kiosk-mode wayland compositor) is enabled
-      app = null; # full path to an app to run - i.e. "${pkgs.cog}/bin/cog"
-      kiosk = null; # url to send a chromium kiosk (with basic gpu acceleration) to - i.e. "https://github.com/JoeyEamigh/nixos-superbird"
+      enable = true; # whether weston is enabled
+
+      # --- only one of the below options can be enabled at a time!! ---
+      kiosk_url = null; # website to place into chromium kiosk mode
+      webapp = null; # path to files to be hosted and displayed in chrome
+      superbird-webapp = null; # whether to enable the original spotify webapp
+      app = null; #path to the application to run in weston
     };
-    # you cannot have both app and kiosk set at the same time - if you need more control use app or disable gui and diy
 
     swap = {
       enable = true; # whether to create a swapfile
-      size = 512; # size of said swapfile in MiB
+      size = 256; # size of said swapfile in MiB
     };
 
-    qemu = false; # whether you are building an image to run IN qemu
+    boot = {
+      # path to png bootlogo to replace the default Thing Labs logo.
+      # NOTE: if you replace the Thing Labs logo, please ensure that credit to nixos-superbird
+      # and ThingLabs is VERY PROMINENTLY displayed in your application's settings or about page.
+      logo = null;
+    };
+
+    legacy-installer = {
+      enable = false; # whether the legacy installer is enabled.
+    };
+
+    installer = {
+      manualScript = false; # whether the manual script is bundled with the terbium installer.
+    };
+
+    stateVersion = "0.2"; # version of nixos-superbird you are using (alerts to breaking changes)
   };
 }
 ```
 
 ## Installation
 
-Once you have built an installer, it will be output to `./result`. Due to the way that `mkfs.btrfs` works, the generated `result/linux/rootfs.img` will most likely be ~3x larger than it needs to be. To compress the image for flashing, first you must copy the files to another directory (since nix symlinks), then run the `scripts/shrink-img.sh` script. A convenience script `installer` is also included in the example flake `Justfile` which does this automatically.
+Once you have built an installer, it will be output to `./result`. Due to the fact that Nix cannot mount loop devices in the build sandbox, you must build the boot partition. There is a script that will do that for you.
 
 ```sh
-mkdir ./out
-cp -r ./result/* ./out/
-
-cd ./out
-sudo ./scripts/shrink-img.sh
+sudo ./scripts/make-bootfs.sh
 ```
 
-Once you have shrunk the image, you are ready to install! Enter your new `out` directory, and run `./install.sh`. This script will walk you through the install process.
+To make a Terbium installer, run the following commands instead:
 
-For a fully scripted installer build, simply run `just run-installer`.
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+nix build '.#nixosConfigurations.superbird.config.system.build.installer' -j$(nproc) --show-trace
+echo "kernel is $(stat -Lc%s -- result/builder/kernel | numfmt --to=iec)"
+echo "rootfs is $(stat -Lc%s -- result/rootfs.img | numfmt --to=iec)"
+
+sudo rm -rf ./out
+mkdir ./out
+cp -r ./result/* ./out/
+chown -R $(whoami):$(whoami) ./out
+cd ./out
+
+sudo ./scripts/make-bootfs.sh
+echo "bootfs built!"
+
+cd ./out/
+zip -r nixos.zip .
+```
 
 ## Post-Install
 
-After the system is installed and booted, you will have to set up a wired network connection (which the installer took care of the first time around). The script at `out/scripts/ssh.sh` will configure your network based on the network interface detected during the install. This may change if you switch the USB port superbird is plugged into, so you can always change the interface name in `out/ssh/interface.txt`.
+After flashing the device, ensure your device attains the ip address `172.16.42.1` from the DHCP server on the superbird. There is no SSH password, so you can connect by running `ssh root@172.16.42.2`.
 
 ## Known Issues
 
-- touchscreen calibration is sometimes incorrect
-- there's a mouse cursor on the screen
+- there's a mouse cursor on the screen in weston when you use the wheel
 
-## Troubleshooting
+<!-- ## Troubleshooting
 
-On some desktop environments, Network Manager will try to set up the new USB network interface and randomly disconnect in the middle of operations. If this happens, run `nmcli device set <interface_name> managed no`.
+On some desktop environments, Network Manager will try to set up the new USB network interface and randomly disconnect in the middle of operations. If this happens, run `nmcli device set <interface_name> managed no`. -->
 
-## Notes
+<!-- ## Notes
 
 To make the install easier, I committed the SSH keys that the devices will use. This is not a problem as the only way to connect to this device is via USB. You can configure custom keys in your `flake.nix` if you so choose.
 
-I am new to Nix and hate Python with a passion, so code quality could probably use some work. PRs welcome!
+I am new to Nix and hate Python with a passion, so code quality could probably use some work. PRs welcome! -->
 
 ## Prior Art
 

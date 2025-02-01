@@ -1,0 +1,37 @@
+{
+  "$schema": "/dev/null",
+  "metadataVersion": 1,
+  "name": "@name@",
+  "version": "@version@",
+  "description": "@description@",
+  "steps": [
+    {
+      "type": "bulkcmd",
+      "value": "amlmmc key"
+    },
+    {
+      "type": "writeLargeMemory",
+      "value": {
+        "address": 0,
+        "data": { "filePath": "./bootfs.bin" },
+        "blockLength": 4096
+      }
+    },
+    {
+      "type": "writeLargeMemory",
+      "value": {
+        "address": 319488,
+        "data": { "filePath": "./rootfs.img" },
+        "blockLength": 4096
+      }
+    },
+    {
+      "type": "writeEnv",
+      "value": { "filePath": "./env.txt" }
+    },
+    {
+      "type": "bulkcmd",
+      "value": "saveenv"
+    }
+  ]
+}

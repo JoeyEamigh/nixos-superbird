@@ -1,14 +1,11 @@
-{ config, ... }:
-let
-  cfg = config.superbird;
-in
+{ ... }:
 {
   users = {
     users = {
       superbird = {
         isNormalUser = true;
         home = "/home/superbird";
-        initialPassword = "superbird";
+        password = "superbird";
         description = "Superbird User";
 
         extraGroups = [
@@ -27,16 +24,17 @@ in
         ];
       };
 
-      root.openssh.authorizedKeys.keyFiles = [
-        ../net/ssh/ssh_host_ed25519_key.pub
-        ../net/ssh/ssh_host_rsa_key.pub
-      ];
+      root = {
+        hashedPassword = "";
+
+        openssh.authorizedKeys.keyFiles = [
+          ../net/ssh/ssh_host_ed25519_key.pub
+          ../net/ssh/ssh_host_rsa_key.pub
+        ];
+      };
     };
 
+    mutableUsers = false;
     groups.superbird.gid = 1000;
   };
-
-  security.sudo.extraConfig = ''
-    %wheel	ALL=(root)	NOPASSWD: ALL
-  '';
 }

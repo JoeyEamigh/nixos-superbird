@@ -7,5 +7,7 @@ let
 in
 {
   superbird.gui.app = "${pkgs.doomretro}/bin/doomretro -iwad ${doomDotWad}";
+
+  superbird.stateVersion = "0.2";
   system.stateVersion = "24.11";
 }

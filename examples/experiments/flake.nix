@@ -20,47 +20,23 @@
       nixosConfigurations = {
         superbird = nixosSystem {
           system = "aarch64-linux";
+          specialArgs = {
+            inherit self;
+          };
           modules = [
             nixos-superbird.nixosModules.superbird
             (
-              { pkgs, ... }:
+              { pkgs, modulesPath, ... }:
               {
-                superbird.gui.app = ''
-                  ${pkgs.ungoogled-chromium}/bin/chromium \
-                    --ozone-platform-hint=auto \
-                    --ozone-platform=wayland \
-                    --no-sandbox \
-                    --autoplay-policy=no-user-gesture-required \
-                    --use-fake-ui-for-media-stream \
-                    --use-fake-device-for-media-stream \
-                    --disable-sync \
-                    --remote-debugging-port=9222 \
-                    --force-device-scale-factor=1.0 \
-                    --pull-to-refresh=0 \
-                    --disable-smooth-scrolling \
-                    --disable-login-animations \
-                    --disable-modal-animations \
-                    --noerrdialogs \
-                    --no-first-run \
-                    --disable-infobars \
-                    --fast \
-                    --fast-start \
-                    --disable-pinch \
-                    --disable-translate \
-                    --overscroll-history-navigation=0 \
-                    --hide-scrollbars \
-                    --disable-overlay-scrollbar \
-                    --disable-features=OverlayScrollbar \
-                    --disable-features=TranslateUI \
-                    --disable-features=TouchpadOverscrollHistoryNavigation,OverscrollHistoryNavigation \
-                    --password-store=basic \
-                    --touch-events=enabled \
-                    --ignore-certificate-errors \
-                    --kiosk \
-                    --app=https://github.com/JoeyEamigh/nixos-superbird
-                '';
+                superbird.gpu.enable = false;
+                superbird.gui.xorg = false;
 
+                superbird.gui.superbird-webapp = true;
+                # superbird.gui.kiosk_url = "https://nocturne.brandons.place";
                 superbird.packages.useful = true;
+                superbird.installer.manualScript = true;
+
+                superbird.stateVersion = "0.2";
                 system.stateVersion = "24.11";
               }
             )
@@ -77,10 +53,6 @@
             sshUser = "root";
             path = deploy-rs.lib.aarch64-linux.activate.nixos self.nixosConfigurations.superbird;
             user = "root";
-            sshOpts = [
-              "-i"
-              "${self.nixosConfigurations.superbird.config.system.build.ed25519Key}"
-            ];
           };
         };
       };

@@ -1,22 +1,20 @@
-{ config, lib, ... }:
-let
-  cfg = config.superbird;
-in
+{ lib, ... }:
 {
   imports = [
+    ./dhcp.nix
     ./ssh.nix
     ./bluetooth.nix
   ];
 
   networking = {
     hostName = "superbird";
-    interfaces.usb0.ipv4.addresses = lib.mkIf (cfg.qemu == false) [
+    interfaces.usb0.ipv4.addresses = [
       {
         address = "172.16.42.2";
         prefixLength = 24;
       }
     ];
-    defaultGateway = lib.mkIf (cfg.qemu == false) {
+    defaultGateway = {
       address = "172.16.42.1";
       interface = "usb0";
     };
@@ -26,5 +24,6 @@ in
     ];
 
     firewall.enable = lib.mkForce false;
+    dhcpcd.wait = "background";
   };
 }
