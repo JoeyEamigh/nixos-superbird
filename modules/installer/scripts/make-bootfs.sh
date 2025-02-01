@@ -22,6 +22,7 @@ fi
 
 cp ./builder/kernel /mnt/image/Image
 cp ./builder/superbird.dtb /mnt/image/superbird.dtb
+cp ./builder/initrd /mnt/image/initrd
 cp ./builder/bootargs.txt /mnt/image/bootargs.txt
 
 umount /mnt/image

@@ -263,7 +263,7 @@ class SuperbirdDevice:
                 )
                 self.print("  You might need to do this multiple times")
                 self.print(
-                    "    If the device is connected through a USB hub, try connecting it directly to a port on your machine"
+                    "    If the device is connected through a USB hub, try connecting it directly to a port on your machine. If it's connected to a port on your machine, try a USB hub!"
                 )
                 sys.exit(1)
         except USBError:
@@ -283,7 +283,7 @@ class SuperbirdDevice:
                 )
                 self.print("  You might need to do this multiple times")
                 self.print(
-                    "    If the device is connected through a USB hub, try connecting it directly to a port on your machine"
+                    "    If the device is connected through a USB hub, try connecting it directly to a port on your machine. If it's connected to a port on your machine, try a USB hub!"
                 )
                 sys.exit(1)
 
@@ -440,7 +440,7 @@ class SuperbirdDevice:
                         self.ADDR_TMP, data, self.TRANSFER_BLOCK_SIZE, appendZeros=True
                     )
                     self.bulkcmd(
-                        f"amlmmc write 1 {hex(self.ADDR_TMP)} {hex(part_offset+offset)} {hex(chunk_size_sector)}"
+                        f"amlmmc write 1 {hex(self.ADDR_TMP)} {hex(part_offset + offset)} {hex(chunk_size_sector)}"
                     )
                     offset += chunk_size_sector
                     if last_chunk:

@@ -18,7 +18,6 @@ in
   imports = [
     ./boot
     ./gui
-    ./initrd
     ./installer
     ./net
     ./profile
@@ -164,11 +163,11 @@ in
       };
     };
 
-    legacy-installer = {
-      enable = mkOption {
+    system = {
+      squashfs = mkOption {
         default = false;
         type = types.bool;
-        description = "whether the legacy installer is enabled.";
+        description = "whether to have the root filesystem be a squashfs";
       };
     };
 

@@ -31,8 +31,8 @@
                 superbird.gpu.enable = false;
                 superbird.gui.xorg = false;
 
-                superbird.gui.superbird-webapp = true;
-                # superbird.gui.kiosk_url = "https://nocturne.brandons.place";
+                # superbird.gui.superbird-webapp = true;
+                superbird.gui.kiosk_url = "https://nocturne.brandons.place";
                 superbird.packages.useful = true;
                 superbird.installer.manualScript = true;
 

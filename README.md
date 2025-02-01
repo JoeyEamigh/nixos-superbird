@@ -135,8 +135,8 @@ To make this flake as easy to use as possible, not many things are directly conf
       logo = null;
     };
 
-    legacy-installer = {
-      enable = false; # whether the legacy installer is enabled.
+    system = {
+      squashfs = true; # whether to use a squashfs as the root file system or ext4 (squashfs is about 1/3 the size but both fit)
     };
 
     installer = {

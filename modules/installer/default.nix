@@ -2,6 +2,5 @@
 {
   imports = [
     ./terbium
-    ./legacy
   ];
 }

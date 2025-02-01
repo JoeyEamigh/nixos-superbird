@@ -37,7 +37,7 @@ zip-installer:
   zip nixos.zip rootfs.img bootfs.bin meta.json env.txt readme.md
 
 cache:
-  attic push superbird \
+  nix run nixpkgs#attic-client -- push superbird \
     $(nix build .#nixosConfigurations.chrome-example.config.system.build.toplevel --no-link --print-out-paths) \
     $(nix build .#nixosConfigurations.headless-example.config.system.build.toplevel --no-link --print-out-paths)
 

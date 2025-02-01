@@ -4,35 +4,35 @@
   lib,
   ...
 }:
-let
-  cfg = config.superbird;
-in
 {
   system.activationScripts.installInitScript = ''
-    ln -fs $systemConfig/${if cfg.legacy-installer.enable then "prepare-root" else "init"} /bin/init
+    ln -fs $systemConfig/init /bin/init
   '';
-
-  system.build.initialRamdisk = "";
-  system.build.initialRamdiskSecretAppender = "";
 
   hardware.enableRedistributableFirmware = lib.mkForce false;
   boot = {
     loader.grub.enable = false;
 
-    initrd.enable = lib.mkForce cfg.legacy-installer.enable;
-    initrd.includeDefaultModules = lib.mkForce false;
-    initrd.supportedFilesystems = lib.mkForce [ ];
-    initrd.kernelModules = lib.mkForce [ ];
-    supportedFilesystems = lib.mkForce [
-      "vfat"
-      "ext4"
-    ];
+    initrd = {
+      enable = true;
+      compressor = "gzip";
+
+      includeDefaultModules = lib.mkForce false;
+      supportedFilesystems = lib.mkForce [ ];
+      availableKernelModules = lib.mkForce [ ];
+      kernelModules = lib.mkForce [ ];
+    };
 
     postBootCommands = ''
       set -x
       # On the first boot do some maintenance tasks
-      if [ -f /nix-path-registration ]; then
+      if [ -f /firstboot ]; then
         echo "boot >>> running first boot setup" > /dev/kmsg
+
+        if [ ! -f /nix-path-registration ]; then
+          echo "boot >>> detected squashfs - copying path registration information" > /dev/kmsg
+          cp /nix/.ro-store/nix-path-registration /nix-path-registration
+        fi
 
         # Ensure that / and a few others are owned by root https://github.com/NixOS/nixpkgs/pull/320643
         # echo "boot >>> chowning root" > /dev/kmsg
@@ -65,13 +65,33 @@ in
 
         # nixos-rebuild also requires a "system" profile and an /etc/NIXOS tag.
         touch /etc/NIXOS
-        # ${config.nix.package.out}/bin/nix-env -p /nix/var/nix/profiles/system --set /run/current-system
+        ${config.nix.package.out}/bin/nix-env -p /nix/var/nix/profiles/system --set /run/current-system
 
         # Prevents this from running on later boots.
         rm -f /nix-path-registration
+        rm -f /firstboot
 
         echo "boot >>> done!" > /dev/kmsg
       fi
     '';
+  };
+
+  system.build.initrd = pkgs.makeInitrd {
+    compressor = "gzip";
+    makeUInitrd = true;
+    prepend = [ "${config.system.build.initialRamdisk}/initrd" ];
+
+    # this is just here so that nix will build an empty uboot initrd
+    contents = [
+      {
+        object = pkgs.makeModulesClosure {
+          rootModules = [ ];
+          kernel = config.system.modulesTree;
+          firmware = [ ];
+          allowMissing = true;
+        };
+        symlink = "/lib";
+      }
+    ];
   };
 }
