@@ -11,6 +11,10 @@
 # experiments
 /experiments
 
+# deskthing
+/deskthing/result
+/deskthing/out
+
 # qemu
 /qemu/emmc.img
 /qemu/kernel
@@ -25,3 +29,7 @@ out
 
 # image
 /tmp
+
+# dumper
+dumper/dump-*
+dumper/out

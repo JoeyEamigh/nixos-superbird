@@ -1,0 +1,29 @@
+{
+  "name": "@name@",
+  "version": "@version@",
+  "description": "@description@",
+  "nixos-superbird": {
+    "owner": "@nixos-superbird-owner@",
+    "repo": "@nixos-superbird-repo@",
+    "rev": "@nixos-superbird-rev@",
+    "ref": "@nixos-superbird-ref@",
+    "type": "@nixos-superbird-type@",
+    "url": "@nixos-superbird-url@",
+    "lastModified": "@nixos-superbird-lastModified@",
+    "narHash": "@nixos-superbird-narHash@"
+  },
+  "derivation": {
+    "owner": "@owner@",
+    "repo": "@repo@",
+    "rev": "@rev@",
+    "ref": "@ref@",
+    "type": "@type@",
+    "lastModified": "@lastModified@",
+    "narHash": "@narHash@"
+  },
+  "btMac": "",
+  "serialNumber": "",
+  "fccId": "2AP3D",
+  "icId": "24262",
+  "modelName": "YX5H6679"
+}
