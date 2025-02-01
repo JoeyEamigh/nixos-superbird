@@ -187,18 +187,6 @@ in
       default = "null";
       description = "version of nixos-superbird you are using (alerts to breaking changes)";
     };
-
-    # src = mkOption {
-    #   type = types.attrs;
-    #   default = self.inputs.nixos-superbird;
-    #   description = "src of nixos-superbird source repo. do not override this!";
-    # };
-
-    # proj = mkOption {
-    #   type = types.attrs;
-    #   default = self;
-    #   description = "project that is building with nixos-superbird. do not override this!";
-    # };
   };
 
   config = {
@@ -233,11 +221,6 @@ in
       ++ lib.optionals (config.superbird.boot.logo != null) [
         "CUSTOM BOOTLOGO IS SET - YOU ARE NOW ON THE HOOK FOR STRICTER CREDIT ATTRIBUTION REQUIREMENTS - CHECK THE README"
       ];
-
-    # _module.args = {
-    #   src = builtins.getFlake (toString ../.);
-    #   proj = self;
-    # };
 
     nixpkgs.overlays = [
       # (self: super: { bridgething = bridgething.packages.${super.system}.bridgething; })
