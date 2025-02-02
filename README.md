@@ -135,10 +135,6 @@ To make this flake as easy to use as possible, not many things are directly conf
       logo = null;
     };
 
-    system = {
-      squashfs = true; # whether to use a squashfs as the root file system or ext4 (squashfs is about 1/3 the size but both fit)
-    };
-
     installer = {
       manualScript = false; # whether the manual script is bundled with the terbium installer.
     };

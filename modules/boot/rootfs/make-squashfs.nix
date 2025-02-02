@@ -12,8 +12,9 @@
   pseudoFiles ? [ ],
   noStrip ? false,
   # Compression parameters.
-  # comp ? "xz -Xbcj arm -Xdict-size 100%",
-  comp ? "gzip -Xcompression-level 9 -Xstrategy filtered",
+  # comp ? "xz -b 262144 -Xbcj arm -Xdict-size 100%",
+  # comp ? "gzip -b 262144 -Xcompression-level 9 -Xstrategy filtered",
+  comp ? "lz4 -b 131072",
 }:
 
 let
@@ -36,7 +37,7 @@ stdenv.mkDerivation {
 
     # Generate the squashfs image.
     mksquashfs nix-path-registration $(cat $closureInfo/store-paths) $imgPath ${pseudoFilesArgs} \
-      -no-hardlinks ${lib.optionalString noStrip "-no-strip"} -keep-as-directory -all-root -b 262144 -comp ${comp} \
+      -no-hardlinks ${lib.optionalString noStrip "-no-strip"} -keep-as-directory -all-root -comp ${comp} \
       -no-exports -no-xattrs -no-fragments -no-recovery -noappend -processors $NIX_BUILD_CORES -root-mode 0755
   '';
 }
