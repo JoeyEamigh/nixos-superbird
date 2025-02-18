@@ -13,7 +13,7 @@
       "type": "writeLargeMemory",
       "value": {
         "address": 0,
-        "data": { "filePath": "./bootfs.bin" },
+        "data": { "filePath": "bootfs.bin" },
         "blockLength": 4096
       }
     },
@@ -21,13 +21,13 @@
       "type": "writeLargeMemory",
       "value": {
         "address": 319488,
-        "data": { "filePath": "./rootfs.img" },
+        "data": { "filePath": "rootfs.img" },
         "blockLength": 4096
       }
     },
     {
       "type": "writeEnv",
-      "value": { "filePath": "./env.txt" }
+      "value": { "filePath": "env.txt" }
     },
     {
       "type": "bulkcmd",

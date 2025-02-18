@@ -14,10 +14,20 @@ Credit to Joey Eamigh and Thing Labs for the firmware image must be provided in 
 
 The intention of this clause is to support and motivate the Thing Labs team, not undermine your own work.
 
+## NOTE!!
+
+Terbium does not yet support this style of image. As a result, you must flash with the "manual script" for now. You can enable it by adding
+
+```nix
+  superbird.installer.manualScript = true;
+```
+
+to your Nix config. We hope to have better installation methods ready soon.
+
 ## Features
 
 - [x] fully customizable NixOS
-- [x] easy installation via Terbium
+- [ ] easy installation via Terbium
 - [x] support for Bluetooth and Bluetooth PAN (tetherless Car Thing, anyone?)
 - [x] `cdc_ncm`-based networking for tethered Linux, Windows, and MacOS support
 - [x] built-in dhcp server for zero-config networking
