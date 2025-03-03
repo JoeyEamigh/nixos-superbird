@@ -45,8 +45,8 @@ ssh:
   ssh -i ./modules/net/ssh/ssh_host_ed25519_key root@172.16.42.2
 
 docker:
-  # cd docker && docker buildx build -f ./Dockerfile.nix --platform linux/amd64,linux/arm64 -t ghcr.io/joeyeamigh/nixos-superbird/builder:latest --push .
-  cd docker && docker buildx build -f ./Dockerfile.nix --platform linux/amd64 -t ghcr.io/joeyeamigh/nixos-superbird/builder:latest .
+  cd docker && docker buildx build -f ./Dockerfile.nix --platform linux/amd64,linux/arm64 -t ghcr.io/joeyeamigh/nixos-superbird/builder:latest --push .
+  # cd docker && docker buildx build -f ./Dockerfile.nix --platform linux/amd64 -t ghcr.io/joeyeamigh/nixos-superbird/builder:latest .
 
 run-docker-example:
   docker run --privileged --rm -it -v ./examples/flake/:/workdir ghcr.io/joeyeamigh/nixos-superbird/builder:latest

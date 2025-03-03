@@ -20,7 +20,7 @@
     {
       "type": "writeLargeMemory",
       "value": {
-        "address": 319488,
+        "address": 180355072,
         "data": { "filePath": "rootfs.img" },
         "blockLength": 4096
       }
