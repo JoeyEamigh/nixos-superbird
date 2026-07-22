@@ -1,5 +1,8 @@
 # NixOS for the Spotify Car Thing
 
+> [!NOTE]
+> I recommend using [yocto-superbird](https://github.com/JoeyEamigh/yocto-superbird) instead for better stability and way more performance :)
+
 `nixos-superbird` is a project to help build custom Linux images for the Spotify Car Thing and easily install them. This is the first project to democratize Linux for the Superbird, and by far the easiest way to attain full control of the Car Thing.
 
 **If you would like to support the development of `nixos-superbird`, please consider sending us any old Car Things you may have lying around. They are rather expensive now.**
